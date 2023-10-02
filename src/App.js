@@ -16,49 +16,60 @@ const dummmtData = [{
 }]
 
 function App() {
-  const [films, setFilms] = useState([]);
+const [films, setFilms] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [retrying, setRetrying] = useState(false);
+  const [retryInterval, setRetryInterval] = useState(null);
+
+  const fetchData = async () => {
+    try {
+      const response = await axios.get('https://swapi.dev/api/films');
+      setFilms(response.data.results);
+      setLoading(false);
+    } catch (error) {
+      console.error('Error fetching data:', error);
+      retryFetch();
+    }
+  };
+
+  const retryFetch = () => {
+    setLoading(true);
+    setRetrying(true);
+    setRetryInterval(setInterval(fetchData, 5000));
+  };
+
+  const cancelRetry = () => {
+    setLoading(false);
+    setRetrying(false);
+    clearInterval(retryInterval); 
+  };
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await axios.get('https://swapi.dev/api/films');
-        setFilms(response.data.results);
-      } catch (error) {
-        console.error('Error fetching data:', error);
-      }
-    };
-
     fetchData();
   }, []);
-  const handleTHeData = () =>{
-    setLoading(false)
-  }
   return (
     <div className="App">
       <div className='container'>
-        <button onClick={handleTHeData}>fetch data</button>
+      <button onClick={retrying ? cancelRetry : retryFetch}>
+          {retrying ? 'Cancel Retry' : 'Retry fetching data'}
+        </button>
         {loading ? (
-         <ul>
-         {dummmtData.map((item) => (
-           <li key={item.id}>
-             <h3>{item.title}</h3>
-             <p>{item.opening_crawl}</p>
-             <h3>{item.release_date}</h3> {/* Corrected to use `item.release_date` */}
-           </li>
-         ))}
-       </ul>
-      ) : (
-        <ul>
-          {films.map((film) => (
-            <li key={film.episode_id}>
-              <h2>{film.title}</h2>
-              <p>Director: {film.director}</p>
-              <p>Release Date: {film.release_date}</p>
+          <ul>
+            <li>
+              <h3>{retrying ? 'Retrying...' : 'Loading...'}</h3>
             </li>
-          ))}
-        </ul>
-      )}
+          </ul>
+        ) : (
+          <ul>
+            {films.map((film) => (
+              <li key={film.episode_id}>
+                <h2>{film.title}</h2>
+                <p>Director: {film.director}</p>
+                <p>Release Date: {film.release_date}</p>
+              </li>
+            ))}
+          </ul>
+        )}
     </div>
     </div>
   );
