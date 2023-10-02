@@ -20,14 +20,16 @@ function App() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Axios GET request to fetch data from the API
-    axios.get('https://swapi.dev/api/films')
-      .then((response) => {
-        setFilms(response.data.results) 
-      })
-      .catch((error) => {
+    const fetchData = async () => {
+      try {
+        const response = await axios.get('https://swapi.dev/api/films');
+        setFilms(response.data.results);
+      } catch (error) {
         console.error('Error fetching data:', error);
-      });
+      }
+    };
+
+    fetchData();
   }, []);
   const handleTHeData = () =>{
     setLoading(false)
