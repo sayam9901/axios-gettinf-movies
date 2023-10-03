@@ -20,6 +20,10 @@ const [films, setFilms] = useState([]);
   const [loading, setLoading] = useState(true);
   const [retrying, setRetrying] = useState(false);
   const [retryInterval, setRetryInterval] = useState(null);
+  const [episodeId, setEpisodeId] = useState('');
+  const [title, setTitle] = useState('');
+  const [releaseDate, setReleaseDate] = useState('');
+  const [director, setDirector] = useState('');
 
   const fetchData = async () => {
     try {
@@ -47,12 +51,57 @@ const [films, setFilms] = useState([]);
   useEffect(() => {
     fetchData();
   }, []);
+  const handlePost = async () => {
+    try {
+      const response = await axios.post('https://swapi.dev/api/films', {
+        episode_id: episodeId,
+        title,
+        release_date: releaseDate,
+        director,
+      });
+      console.log('POST response:', response.data);
+      // Optionally, you can clear the input fields after a successful post
+      setEpisodeId('');
+      setTitle('');
+      setReleaseDate('');
+      setDirector('');
+    } catch (error) {
+      console.error('Error posting data:', error);
+    }
+  };
   return (
     <div className="App">
       <div className='container'>
       <button onClick={retrying ? cancelRetry : retryFetch}>
           {retrying ? 'Cancel Retry' : 'Retry fetching data'}
         </button>
+        <div>
+          <input
+            type="number"
+            placeholder="Episode ID"
+            value={episodeId}
+            onChange={(e) => setEpisodeId(e.target.value)}
+          />
+          <input
+            type="text"
+            placeholder="Title"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+          />
+          <input
+            type="date"
+            placeholder="Release Date"
+            value={releaseDate}
+            onChange={(e) => setReleaseDate(e.target.value)}
+          />
+          <input
+            type="text"
+            placeholder="Director"
+            value={director}
+            onChange={(e) => setDirector(e.target.value)}
+          />
+          <button onClick={handlePost}>Post Data</button>
+        </div>
         {loading ? (
           <ul>
             <li>
