@@ -69,6 +69,15 @@ const [films, setFilms] = useState([]);
       console.error('Error posting data:', error);
     }
   };
+  const handleDelete = async (id) => {
+    try {
+      await axios.delete(`https://your-api-endpoint.com/delete/${id}`);
+      console.log(`Deleted item with ID: ${id}`);
+      fetchData(); // Refresh the list after a successful delete
+    } catch (error) {
+      console.error('Error deleting data:', error);
+    }
+  };
   return (
     <div className="App">
       <div className='container'>
@@ -115,6 +124,7 @@ const [films, setFilms] = useState([]);
                 <h2>{film.title}</h2>
                 <p>Director: {film.director}</p>
                 <p>Release Date: {film.release_date}</p>
+                <button onClick={() => handleDelete(film.episode_id)}>Delete</button>
               </li>
             ))}
           </ul>
